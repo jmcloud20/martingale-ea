@@ -8,6 +8,8 @@
 #property version   "1.00"
 #property strict
 
+input string mainSettings="";
+
 extern int TakeProfit = 60;
 extern int PipStep = 150;
 extern double dynamicMult = .5;
@@ -15,6 +17,13 @@ extern int maxTrade = 14;
 
 double previousDayHigh = 0;
 double previousDayLow = 0;
+
+
+input string tpSettings="";
+
+extern int fifty=5;
+extern int twentyFive=8;
+extern int breakEven=10;
 
 
 //+------------------------------------------------------------------+
@@ -30,6 +39,7 @@ int initLimit = 1;
 //+------------------------------------------------------------------+
 //| Switch BUY / SELL                                                |
 //+------------------------------------------------------------------+
+input string disableSettings="";
 extern bool disableBuy = false;
 extern bool disableSell = false;
 
@@ -324,11 +334,11 @@ int deinit()
       averagePrice = averagePrice / totalLots;
       int totalOrders = getTotalOrders();
       int sellTP=0;
-      if(totalOrders>5){
+      if(totalOrders>fifty){
          sellTP = TakeProfit / 2;
-      }else if(totalOrders>8){
+      }else if(totalOrders>twentyFive){
          sellTP = TakeProfit / 4;
-      }else if(totalOrders>10){
+      }else if(totalOrders>breakEven){
          sellTP = 0;
       }else{
          sellTP = TakeProfit;
@@ -371,6 +381,9 @@ int deinit()
   
   void openOrder(){
       double tp = Bid - (TakeProfit * Point());
+      if(StartLot < .01){
+         StartLot = .01;
+      }
       
       bool sendHasError = OrderSend(
                Symbol(), 
@@ -540,11 +553,11 @@ int deinit()
       averagePrice = averagePrice / totalLots;
       int buyTP=0;
       int totalOrders = BuygetTotalOrders();
-      if(totalOrders>5){
+      if(totalOrders>fifty){
          buyTP = TakeProfit / 2;
-      }else if(totalOrders>8){
+      }else if(totalOrders>twentyFive){
          buyTP = TakeProfit / 4;
-      }else if(totalOrders>10){
+      }else if(totalOrders>breakEven){
          buyTP = 0;
       }else{
          buyTP = TakeProfit;
@@ -562,5 +575,8 @@ int deinit()
   
   void BuyopenOrder(){
       double tp = Ask + (TakeProfit * Point());      
+      if(BuyStartLot < .01){
+         BuyStartLot = .01;
+      }
       bool sendHasError = OrderSend(Symbol(), OP_BUY,NormalizeDouble(BuyStartLot, 2), Ask, BuyvSlippage, 0, tp, StringConcatenate(BuyEAName,"-",BuygetTotalOrders()), BuymagicNumber, 0, Blue);
   }
